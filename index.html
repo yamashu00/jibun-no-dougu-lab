@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>じぶんの道具ラボ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:   #0D9488;
+  --teal-l: #CCFBF1;
+  --teal-d: #0F766E;
+  --amber:  #D97706;
+  --amber-l:#FEF3C7;
+  --bg:     #F8FAFC;
+  --white:  #ffffff;
+  --g100:   #F1F5F9;
+  --g200:   #E2E8F0;
+  --g400:   #94A3B8;
+  --g600:   #475569;
+  --g800:   #1E293B;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--g800);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--g200);
+  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { font-size: 28px; }
+.logo-text { font-size: 18px; font-weight: 800; color: var(--teal); }
+.logo-sub  { font-size: 12px; color: var(--g400); margin-top: 1px; }
+
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab {
+  padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+  font-size: 14px; font-weight: 500; font-family: inherit; transition: all 0.15s;
+}
+.nav-tab.active { background: var(--teal); color: white; }
+.nav-tab:not(.active) { background: transparent; color: var(--g600); }
+
+/* ── SCREEN ── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-d) 100%);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+}
+.hero-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+.hero-sub { font-size: 15px; opacity: 0.9; line-height: 1.6; margin-bottom: 24px; }
+.hero-cta {
+  display: inline-block; background: white; color: var(--teal);
+  padding: 12px 28px; border-radius: 100px; font-size: 15px; font-weight: 700;
+  cursor: pointer; border: none; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: transform 0.15s;
+}
+.hero-cta:hover { transform: translateY(-2px); }
+
+.stats-row {
+  display: flex; justify-content: center; gap: 32px; margin-top: 28px;
+}
+.stat { text-align: center; }
+.stat-num { font-size: 28px; font-weight: 800; }
+.stat-label { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+/* ── CONTENT ── */
+.content { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-size: 18px; font-weight: 700; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::before {
+  content: ''; display: block; width: 4px; height: 20px;
+  background: var(--teal); border-radius: 2px;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px;
+  scrollbar-width: none; padding-bottom: 4px;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 6px 16px; border-radius: 20px; border: 1.5px solid var(--g200);
+  background: white; white-space: nowrap; cursor: pointer; font-size: 13px;
+  font-weight: 500; font-family: inherit; flex-shrink: 0; transition: all 0.15s;
+}
+.filter-chip.active { background: var(--teal); border-color: var(--teal); color: white; }
+
+/* ── CATALOG GRID ── */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.tool-card {
+  background: white; border: 1px solid var(--g200); border-radius: 16px;
+  overflow: hidden; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+}
+.tool-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+.tool-thumb {
+  height: 140px; display: flex; align-items: center; justify-content: center;
+  font-size: 64px; position: relative;
+}
+.tool-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--teal-l); color: var(--teal-d);
+  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+}
+.tool-badge.new { background: #FEE2E2; color: #B91C1C; }
+
+.tool-body { padding: 14px 16px; }
+.tool-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.tool-desc { font-size: 13px; color: var(--g600); line-height: 1.55; margin-bottom: 10px; }
+.tool-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag {
+  font-size: 11px; background: var(--g100); color: var(--g600);
+  padding: 3px 9px; border-radius: 20px;
+}
+.tool-footer {
+  padding: 10px 16px; border-top: 1px solid var(--g100);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.tool-status { font-size: 12px; color: var(--g400); }
+.detail-btn {
+  font-size: 13px; color: var(--teal); font-weight: 600; background: none;
+  border: none; cursor: pointer; font-family: inherit;
+}
+
+/* ── HOW IT WORKS ── */
+.flow-section { background: white; border-radius: 16px; padding: 24px; margin-bottom: 40px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 16px; }
+.step { text-align: center; padding: 16px 8px; }
+.step-num {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--teal);
+  color: white; font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px;
+}
+.step-icon { font-size: 28px; margin-bottom: 8px; }
+.step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.step-desc { font-size: 12px; color: var(--g600); line-height: 1.5; }
+.step-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--g200); padding-top: 8px;
+}
+
+/* ── REQUEST SCREEN ── */
+.request-screen { max-width: 640px; margin: 0 auto; padding: 24px 20px; }
+
+.info-banner {
+  background: var(--teal-l); border: 1px solid #99F6E4; border-radius: 12px;
+  padding: 16px; margin-bottom: 24px; font-size: 14px; color: var(--teal-d); line-height: 1.6;
+}
+
+.form-card {
+  background: white; border: 1px solid var(--g200); border-radius: 16px; padding: 28px;
+  margin-bottom: 24px;
+}
+.form-card-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+
+.field { margin-bottom: 20px; }
+.field label {
+  display: block; font-size: 13px; font-weight: 700; color: var(--g600); margin-bottom: 8px;
+}
+.field label .required {
+  color: #EF4444; font-size: 11px; margin-left: 4px; font-weight: 500;
+}
+.field label .hint {
+  font-weight: 400; color: var(--g400); font-size: 12px; margin-left: 6px;
+}
+.field input, .field textarea, .field select {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--g200);
+  border-radius: 10px; font-size: 15px; font-family: inherit; color: var(--g800);
+  background: var(--g100); transition: all 0.15s;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none; border-color: var(--teal); background: white;
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+}
+.field textarea { resize: vertical; }
+.char-count { text-align: right; font-size: 12px; color: var(--g400); margin-top: 4px; }
+
+.situation-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.situation-btn {
+  padding: 10px 12px; border: 1.5px solid var(--g200); border-radius: 10px;
+  background: white; cursor: pointer; font-size: 13px; font-weight: 500;
+  font-family: inherit; text-align: center; transition: all 0.15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.situation-btn.selected { border-color: var(--teal); background: var(--teal-l); color: var(--teal-d); }
+
+.submit-btn {
+  width: 100%; padding: 14px; background: var(--teal); color: white;
+  border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.submit-btn:hover { background: var(--teal-d); }
+
+/* ── MY REQUESTS ── */
+.my-requests { margin-top: 32px; }
+.request-card {
+  background: white; border: 1px solid var(--g200); border-radius: 12px;
+  padding: 16px; margin-bottom: 10px;
+}
+.request-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.request-title { font-size: 15px; font-weight: 600; }
+.status-chip {
+  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+}
+.status-chip.s1 { background: #E0F2FE; color: #0369A1; }
+.status-chip.s2 { background: #FEF3C7; color: #B45309; }
+.status-chip.s3 { background: #F3E8FF; color: #7E22CE; }
+.status-chip.s4 { background: #DCFCE7; color: #15803D; }
+
+.request-desc { font-size: 13px; color: var(--g600); margin-top: 6px; line-height: 1.5; }
+
+.progress-bar {
+  margin-top: 12px; height: 6px; background: var(--g100); border-radius: 3px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.5s; }
+
+.timeline { margin-top: 12px; padding-left: 16px; border-left: 2px solid var(--g200); }
+.timeline-item { padding: 4px 0 8px 16px; font-size: 12px; color: var(--g600); position: relative; }
+.timeline-item::before {
+  content: ''; position: absolute; left: -9px; top: 8px;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--g200); border: 2px solid white;
+}
+.timeline-item.done::before { background: var(--teal); }
+.timeline-item strong { color: var(--g800); font-weight: 600; }
+
+/* ── SUCCESS MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 200; padding: 20px;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: 20px; padding: 32px 28px;
+  max-width: 420px; width: 100%; text-align: center;
+  animation: popIn 0.25s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.modal-icon { font-size: 56px; margin-bottom: 16px; }
+.modal-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+.modal-text { font-size: 14px; color: var(--g600); line-height: 1.7; margin-bottom: 24px; }
+.modal-close {
+  width: 100%; padding: 12px; background: var(--teal); color: white;
+  border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔧</div>
+    <div>
+      <div class="logo-text">じぶんの道具ラボ</div>
+      <div class="logo-sub">自助グッズ共同設計プラットフォーム（プロトタイプ）</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen('catalog', this)">🗂️ 道具を探す</button>
+    <button class="nav-tab" onclick="showScreen('request', this)">✏️ 道具を依頼する</button>
+  </div>
+</header>
+
+<!-- ═══ CATALOG SCREEN ═══════════════════════════════════════════ -->
+<div id="catalog" class="screen active">
+
+  <div class="hero">
+    <div class="hero-title">あなたが必要な道具を、<br>一緒に作ります。</div>
+    <div class="hero-sub">困りごとをテキストで伝えるだけ。<br>高専生チームがあなたのための自助グッズを設計・製作します。</div>
+    <button class="hero-cta" onclick="showScreen('request', document.querySelector('[onclick*=request]'))">
+      道具を依頼する →
+    </button>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">23</div><div class="stat-label">制作実績</div></div>
+      <div class="stat"><div class="stat-num">11</div><div class="stat-label">対応中</div></div>
+      <div class="stat"><div class="stat-num">4.8</div><div class="stat-label">満足度</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- How it works -->
+    <div class="flow-section">
+      <div class="section-title">使い方</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon">✏️</div>
+          <div class="step-title">困りごとを書く</div>
+          <div class="step-desc">職場や学校での困りごとをテキストで自由に記述するだけ</div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🤝</div>
+          <div class="step-title">高専生が受け取る</div>
+          <div class="step-desc">神山まるごと高専の学生チームがニーズを確認し設計開始</div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🛠️</div>
+          <div class="step-title">試作品が届く</div>
+          <div class="step-desc">3Dプリント・電子工作などで製作した試作品を送付</div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🔄</div>
+          <div class="step-title">一緒に改善する</div>
+          <div class="step-desc">使ってみてフィードバック。納得いくまで繰り返す</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Catalog -->
+    <div class="section-title">制作実績・サンプル</div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-chip active" onclick="filterCatalog('all', this)">すべて</button>
+      <button class="filter-chip" onclick="filterCatalog('手・指', this)">手・指の操作</button>
+      <button class="filter-chip" onclick="filterCatalog('コミュニケーション', this)">コミュニケーション</button>
+      <button class="filter-chip" onclick="filterCatalog('感覚', this)">感覚・認知</button>
+      <button class="filter-chip" onclick="filterCatalog('就労', this)">就労支援</button>
+    </div>
+
+    <div class="catalog-grid" id="catalogGrid"></div>
+
+  </div>
+</div>
+
+<!-- ═══ REQUEST SCREEN ════════════════════════════════════════════ -->
+<div id="request" class="screen">
+<div class="request-screen">
+
+  <div class="info-banner">
+    💡 <strong>使い方：</strong>「〇〇が難しい」「〇〇のときに困っている」など、日常の言葉で書いてください。専門的な名称や診断名は不要です。
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-title">📝 困りごとを教えてください</div>
+
+    <div class="field">
+      <label>どんな場面で困っていますか？<span class="required">必須</span></label>
+      <div class="situation-grid" id="situationGrid">
+        <button class="situation-btn" onclick="toggleSituation(this)">💼 職場・インターン</button>
+        <button class="situation-btn" onclick="toggleSituation(this)">🎓 授業・講義</button>
+        <button class="situation-btn" onclick="toggleSituation(this)">📝 就職活動</button>
+        <button class="situation-btn" onclick="toggleSituation(this)">🍴 食事・休憩</button>
+        <button class="situation-btn" onclick="toggleSituation(this)">💬 人とのやりとり</button>
+        <button class="situation-btn" onclick="toggleSituation(this)">🏠 その他・日常生活</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>困っていることを詳しく教えてください<span class="required">必須</span><span class="hint">（専門用語不要、日常の言葉で）</span></label>
+      <textarea id="needsText" rows="5"
+        placeholder="例：書類にハンコを押すとき、手に力が入らず紙がずれてしまいます。両手が使えればいいのですが、左手の可動域が限られていて…"
+        oninput="updateCount(this, 'needsCount', 300)"></textarea>
+      <div class="char-count"><span id="needsCount">0</span> / 300文字</div>
+    </div>
+
+    <div class="field">
+      <label>今どんな方法で工夫していますか？<span class="hint">（あれば）</span></label>
+      <textarea id="workaround" rows="3"
+        placeholder="例：テープで固定していますが、毎回剥がれてしまいます"></textarea>
+    </div>
+
+    <div class="field">
+      <label>どんな感触・素材が好みですか？<span class="hint">（感覚過敏がある場合など）</span></label>
+      <input type="text" id="sensory"
+        placeholder="例：プラスチックより布地が好き、重さがある方が安心する、など">
+    </div>
+
+    <div class="field">
+      <label>ニックネーム（任意）</label>
+      <input type="text" id="nickname" placeholder="例：さくらさん">
+    </div>
+
+    <button class="submit-btn" onclick="submitRequest()">
+      📨 依頼を送る（無料）
+    </button>
+  </div>
+
+  <!-- My requests -->
+  <div class="my-requests">
+    <div class="section-title">依頼の進捗</div>
+    <div id="requestList"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="overlay" id="successOverlay">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">依頼を受け付けました！</div>
+    <div class="modal-text">
+      高専生チームが内容を確認し、<strong>3〜5日以内</strong>にご連絡します。<br><br>
+      設計が始まったらメールでお知らせします。<br>
+      一緒に、あなたに合った道具を作りましょう。
+    </div>
+    <button class="modal-close" onclick="closeModal()">閉じる</button>
+  </div>
+</div>
+
+<script>
+// ─── CATALOG DATA ─────────────────────────────────────────────────
+const TOOLS = [
+  {
+    id: 1, name: '片手ハンコ台', icon: '🔏', color: '#DBEAFE',
+    desc: '片手でも書類にハンコを押せるように、紙を固定するクリップ付きの台。角度も調整可能。',
+    tags: ['手・指', '就労'], status: '設計データ公開中', badge: '人気',
+  },
+  {
+    id: 2, name: 'ひとくちカフ', icon: '🥄', color: '#DCFCE7',
+    desc: 'スプーンやフォークを手のひら全体で持てるようにするシリコン製のグリップ補助具。',
+    tags: ['手・指'], status: '設計データ公開中', badge: '',
+  },
+  {
+    id: 3, name: '小声メモパッド', icon: '📋', color: '#F3E8FF',
+    desc: '声が出にくいときのために、よく使うフレーズをカード型でまとめたセット。職場用と日常用の2種。',
+    tags: ['コミュニケーション', '就労'], status: '設計データ公開中', badge: 'new',
+  },
+  {
+    id: 4, name: 'キーボードガード', icon: '⌨️', color: '#FEF3C7',
+    desc: '意図しないキーを押してしまう場合に、入力したいキー以外をガードするアクリル製カバー。',
+    tags: ['手・指', '就労'], status: '試作改善中', badge: '',
+  },
+  {
+    id: 5, name: '光のひとこと', icon: '💡', color: '#FFEDD5',
+    desc: '言葉の代わりに光の色で気持ちを伝えるデバイス。「集中中」「少し待って」「OK」を色で表示。',
+    tags: ['コミュニケーション', '感覚'], status: '設計データ公開中', badge: 'new',
+  },
+  {
+    id: 6, name: 'ぐっすりイヤーマフ記録帳', icon: '🎧', color: '#E0F2FE',
+    desc: '市販イヤーマフと組み合わせて使う「今日の感覚ログ」カード。どの音が辛かったかを記録できる。',
+    tags: ['感覚', '就労'], status: '設計データ公開中', badge: '',
+  },
+];
+
+let activeFilter = 'all';
+
+function filterCatalog(tag, el) {
+  activeFilter = tag;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const grid = document.getElementById('catalogGrid');
+  const filtered = activeFilter === 'all' ? TOOLS : TOOLS.filter(t => t.tags.includes(activeFilter));
+  grid.innerHTML = filtered.map(t => `
+    <div class="tool-card">
+      <div class="tool-thumb" style="background:${t.color};">
+        <span>${t.icon}</span>
+        ${t.badge ? `<div class="tool-badge ${t.badge === 'new' ? 'new' : ''}">${t.badge}</div>` : ''}
+      </div>
+      <div class="tool-body">
+        <div class="tool-name">${t.name}</div>
+        <div class="tool-desc">${t.desc}</div>
+        <div class="tool-tags">${t.tags.map(g => `<span class="tag">${g}</span>`).join('')}</div>
+      </div>
+      <div class="tool-footer">
+        <span class="tool-status">📁 ${t.status}</span>
+        <button class="detail-btn">詳細 →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── SITUATION SELECT ────────────────────────────────────────────
+function toggleSituation(el) {
+  el.classList.toggle('selected');
+}
+
+// ─── CHAR COUNT ──────────────────────────────────────────────────
+function updateCount(el, countId, max) {
+  const len = el.value.length;
+  document.getElementById(countId).textContent = len;
+  if (len > max) el.value = el.value.slice(0, max);
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────────────
+const SAMPLE_REQUESTS = [
+  {
+    title: '書類整理用の片手クリップ台',
+    desc: '職場で書類をまとめるとき、片手だと紙がバラバラになってしまいます。',
+    status: '設計中', cls: 's2', progress: 50,
+    timeline: [
+      { done: true, text: '依頼を受け付けました' },
+      { done: true, text: '担当チームが決まりました（神山Bチーム）' },
+      { done: false, text: '設計案をお送りします（今週中）' },
+      { done: false, text: '試作品の製作' },
+    ]
+  },
+];
+
+function renderRequests() {
+  const list = document.getElementById('requestList');
+  const stored = JSON.parse(localStorage.getItem('jido_requests') || '[]');
+  const all = [...stored, ...SAMPLE_REQUESTS];
+  if (!all.length) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">まだ依頼はありません</div>';
+    return;
+  }
+  list.innerHTML = all.map(r => `
+    <div class="request-card">
+      <div class="request-header">
+        <div class="request-title">${r.title}</div>
+        <span class="status-chip ${r.cls}">${r.status}</span>
+      </div>
+      <div class="request-desc">${r.desc}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${r.progress}%"></div></div>
+      <div class="timeline">
+        ${r.timeline.map(item => `
+          <div class="timeline-item ${item.done ? 'done' : ''}">
+            ${item.done ? '<strong>' + item.text + '</strong>' : item.text}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function submitRequest() {
+  const needs = document.getElementById('needsText').value.trim();
+  const situations = [...document.querySelectorAll('.situation-btn.selected')].map(b => b.textContent.trim());
+  if (!needs || !situations.length) {
+    alert('場面と困りごとを入力してください');
+    return;
+  }
+  const req = {
+    title: needs.slice(0, 30) + (needs.length > 30 ? '…' : ''),
+    desc: needs,
+    status: '受付中', cls: 's1', progress: 10,
+    timeline: [
+      { done: true, text: '依頼を受け付けました' },
+      { done: false, text: '担当チームのアサイン（3〜5日）' },
+      { done: false, text: '設計案の作成' },
+      { done: false, text: '試作品の製作・送付' },
+    ]
+  };
+  const stored = JSON.parse(localStorage.getItem('jido_requests') || '[]');
+  stored.unshift(req);
+  localStorage.setItem('jido_requests', JSON.stringify(stored));
+  document.getElementById('successOverlay').classList.add('open');
+  document.getElementById('needsText').value = '';
+  document.querySelectorAll('.situation-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('needsCount').textContent = '0';
+  renderRequests();
+}
+
+function closeModal() {
+  document.getElementById('successOverlay').classList.remove('open');
+}
+
+// ─── SCREEN SWITCH ───────────────────────────────────────────────
+function showScreen(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'request') renderRequests();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────
+renderCatalog();
+</script>
+</body>
+</html>
