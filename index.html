@@ -11,8 +11,6 @@
   --teal:   #0D9488;
   --teal-l: #CCFBF1;
   --teal-d: #0F766E;
-  --amber:  #D97706;
-  --amber-l:#FEF3C7;
   --bg:     #F8FAFC;
   --white:  #ffffff;
   --g100:   #F1F5F9;
@@ -20,7 +18,27 @@
   --g400:   #94A3B8;
   --g600:   #475569;
   --g800:   #1E293B;
+  --font-scale: 1;
 }
+
+/* ── HIGH CONTRAST MODE ── */
+body.high-contrast {
+  --teal:   #007A6E;
+  --bg:     #000000;
+  --white:  #111111;
+  --g100:   #1a1a1a;
+  --g200:   #333333;
+  --g400:   #aaaaaa;
+  --g600:   #cccccc;
+  --g800:   #ffffff;
+  --teal-l: #003830;
+}
+body.high-contrast header { background: #111; border-color: #444; }
+body.high-contrast .hero { background: #003830; }
+body.high-contrast .tool-card,
+body.high-contrast .form-card,
+body.high-contrast .request-card,
+body.high-contrast .flow-section { border-color: #444; }
 
 html, body { height: 100%; }
 body {
@@ -30,7 +48,29 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  font-size: calc(16px * var(--font-scale));
 }
+
+/* ── ACCESSIBILITY TOOLBAR ── */
+#a11y-bar {
+  background: var(--g800);
+  color: white;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+#a11y-bar span { color: var(--g400); margin-right: 4px; }
+.a11y-btn {
+  padding: 4px 12px; border-radius: 6px; border: 1px solid #444;
+  background: #2d2d2d; color: white; cursor: pointer; font-size: 13px;
+  font-family: inherit; transition: background 0.15s; white-space: nowrap;
+}
+.a11y-btn:hover { background: #3d3d3d; }
+.a11y-btn.on { background: var(--teal); border-color: var(--teal); }
+.a11y-sep { color: #444; }
 
 /* ── HEADER ── */
 header {
@@ -45,12 +85,10 @@ header {
   top: 0;
   z-index: 50;
 }
-
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-icon { font-size: 28px; }
 .logo-text { font-size: 18px; font-weight: 800; color: var(--teal); }
 .logo-sub  { font-size: 12px; color: var(--g400); margin-top: 1px; }
-
 .nav-tabs { display: flex; gap: 4px; }
 .nav-tab {
   padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
@@ -66,12 +104,10 @@ header {
 /* ── HERO ── */
 .hero {
   background: linear-gradient(135deg, var(--teal) 0%, var(--teal-d) 100%);
-  color: white;
-  padding: 40px 20px;
-  text-align: center;
+  color: white; padding: 40px 20px; text-align: center;
 }
-.hero-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
-.hero-sub { font-size: 15px; opacity: 0.9; line-height: 1.6; margin-bottom: 24px; }
+.hero-title { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.4; }
+.hero-sub   { font-size: 15px; opacity: 0.9; line-height: 1.7; margin-bottom: 24px; }
 .hero-cta {
   display: inline-block; background: white; color: var(--teal);
   padding: 12px 28px; border-radius: 100px; font-size: 15px; font-weight: 700;
@@ -79,18 +115,14 @@ header {
   box-shadow: 0 4px 14px rgba(0,0,0,0.15); transition: transform 0.15s;
 }
 .hero-cta:hover { transform: translateY(-2px); }
-
-.stats-row {
-  display: flex; justify-content: center; gap: 32px; margin-top: 28px;
-}
+.stats-row { display: flex; justify-content: center; gap: 32px; margin-top: 28px; }
 .stat { text-align: center; }
-.stat-num { font-size: 28px; font-weight: 800; }
+.stat-num   { font-size: 28px; font-weight: 800; }
 .stat-label { font-size: 12px; opacity: 0.8; margin-top: 2px; }
 
 /* ── CONTENT ── */
 .content { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
 
-/* ── SECTION TITLE ── */
 .section-title {
   font-size: 18px; font-weight: 700; margin-bottom: 16px;
   display: flex; align-items: center; gap: 8px;
@@ -108,7 +140,7 @@ header {
 .filter-bar::-webkit-scrollbar { display: none; }
 .filter-chip {
   padding: 6px 16px; border-radius: 20px; border: 1.5px solid var(--g200);
-  background: white; white-space: nowrap; cursor: pointer; font-size: 13px;
+  background: var(--white); white-space: nowrap; cursor: pointer; font-size: 13px;
   font-weight: 500; font-family: inherit; flex-shrink: 0; transition: all 0.15s;
 }
 .filter-chip.active { background: var(--teal); border-color: var(--teal); color: white; }
@@ -117,16 +149,13 @@ header {
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 40px;
+  gap: 16px; margin-bottom: 40px;
 }
-
 .tool-card {
-  background: white; border: 1px solid var(--g200); border-radius: 16px;
+  background: var(--white); border: 1px solid var(--g200); border-radius: 16px;
   overflow: hidden; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
 }
 .tool-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-
 .tool-thumb {
   height: 140px; display: flex; align-items: center; justify-content: center;
   font-size: 64px; position: relative;
@@ -137,89 +166,136 @@ header {
   font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
 }
 .tool-badge.new { background: #FEE2E2; color: #B91C1C; }
-
 .tool-body { padding: 14px 16px; }
 .tool-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .tool-desc { font-size: 13px; color: var(--g600); line-height: 1.55; margin-bottom: 10px; }
 .tool-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.tag {
-  font-size: 11px; background: var(--g100); color: var(--g600);
-  padding: 3px 9px; border-radius: 20px;
-}
+.tag { font-size: 11px; background: var(--g100); color: var(--g600); padding: 3px 9px; border-radius: 20px; }
 .tool-footer {
   padding: 10px 16px; border-top: 1px solid var(--g100);
   display: flex; align-items: center; justify-content: space-between;
 }
 .tool-status { font-size: 12px; color: var(--g400); }
-.detail-btn {
-  font-size: 13px; color: var(--teal); font-weight: 600; background: none;
-  border: none; cursor: pointer; font-family: inherit;
-}
+.detail-btn { font-size: 13px; color: var(--teal); font-weight: 600; background: none; border: none; cursor: pointer; font-family: inherit; }
 
 /* ── HOW IT WORKS ── */
-.flow-section { background: white; border-radius: 16px; padding: 24px; margin-bottom: 40px; }
+.flow-section { background: var(--white); border: 1px solid var(--g200); border-radius: 16px; padding: 24px; margin-bottom: 40px; }
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 16px; }
 .step { text-align: center; padding: 16px 8px; }
-.step-num {
-  width: 40px; height: 40px; border-radius: 50%; background: var(--teal);
-  color: white; font-size: 16px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 10px;
-}
-.step-icon { font-size: 28px; margin-bottom: 8px; }
+.step-icon  { font-size: 28px; margin-bottom: 8px; }
 .step-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-.step-desc { font-size: 12px; color: var(--g600); line-height: 1.5; }
-.step-arrow {
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; color: var(--g200); padding-top: 8px;
-}
+.step-desc  { font-size: 12px; color: var(--g600); line-height: 1.5; }
 
 /* ── REQUEST SCREEN ── */
 .request-screen { max-width: 640px; margin: 0 auto; padding: 24px 20px; }
 
+/* ── INPUT METHOD SELECTOR ── */
+.input-method-bar {
+  display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.method-btn {
+  padding: 10px 18px; border-radius: 10px; border: 1.5px solid var(--g200);
+  background: var(--white); cursor: pointer; font-size: 14px; font-weight: 600;
+  font-family: inherit; display: flex; align-items: center; gap: 8px;
+  transition: all 0.15s; flex: 1; min-width: 120px; justify-content: center;
+}
+.method-btn.active { border-color: var(--teal); background: var(--teal-l); color: var(--teal-d); }
+
+/* ── VOICE INPUT PANEL ── */
+.voice-panel {
+  background: var(--white); border: 1px solid var(--g200); border-radius: 16px;
+  padding: 24px; text-align: center; margin-bottom: 20px; display: none;
+}
+.voice-panel.show { display: block; }
+.mic-btn {
+  width: 80px; height: 80px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--teal); color: white; font-size: 32px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; transition: all 0.2s; box-shadow: 0 4px 16px rgba(13,148,136,0.3);
+}
+.mic-btn:hover  { transform: scale(1.05); }
+.mic-btn.listening {
+  background: #EF4444; animation: pulse-mic 1s infinite;
+  box-shadow: 0 0 0 8px rgba(239,68,68,0.2);
+}
+@keyframes pulse-mic {
+  0%,100% { box-shadow: 0 0 0 8px rgba(239,68,68,0.2); }
+  50%      { box-shadow: 0 0 0 16px rgba(239,68,68,0.1); }
+}
+.mic-status { font-size: 14px; color: var(--g600); margin-bottom: 12px; }
+.voice-transcript {
+  background: var(--g100); border-radius: 10px; padding: 14px;
+  font-size: 15px; color: var(--g800); min-height: 60px; text-align: left;
+  line-height: 1.6; border: 1px solid var(--g200);
+}
+.voice-transcript.empty { color: var(--g400); }
+.voice-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: center; }
+.voice-use-btn {
+  padding: 10px 20px; background: var(--teal); color: white; border: none;
+  border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.voice-clear-btn {
+  padding: 10px 20px; background: var(--g100); color: var(--g600); border: 1px solid var(--g200);
+  border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;
+}
+.no-speech-note { font-size: 12px; color: var(--g400); margin-top: 12px; line-height: 1.6; }
+
+/* ── TEXT INPUT PANEL ── */
+.text-panel { display: none; }
+.text-panel.show { display: block; }
+
+/* ── COMMON FORM ── */
 .info-banner {
   background: var(--teal-l); border: 1px solid #99F6E4; border-radius: 12px;
   padding: 16px; margin-bottom: 24px; font-size: 14px; color: var(--teal-d); line-height: 1.6;
 }
-
 .form-card {
-  background: white; border: 1px solid var(--g200); border-radius: 16px; padding: 28px;
-  margin-bottom: 24px;
+  background: var(--white); border: 1px solid var(--g200); border-radius: 16px;
+  padding: 28px; margin-bottom: 24px;
 }
 .form-card-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
-
 .field { margin-bottom: 20px; }
 .field label {
   display: block; font-size: 13px; font-weight: 700; color: var(--g600); margin-bottom: 8px;
 }
-.field label .required {
-  color: #EF4444; font-size: 11px; margin-left: 4px; font-weight: 500;
-}
-.field label .hint {
-  font-weight: 400; color: var(--g400); font-size: 12px; margin-left: 6px;
-}
+.field label .required { color: #EF4444; font-size: 11px; margin-left: 4px; font-weight: 500; }
+.field label .hint     { font-weight: 400; color: var(--g400); font-size: 12px; margin-left: 6px; }
 .field input, .field textarea, .field select {
   width: 100%; padding: 10px 14px; border: 1px solid var(--g200);
   border-radius: 10px; font-size: 15px; font-family: inherit; color: var(--g800);
   background: var(--g100); transition: all 0.15s;
 }
 .field input:focus, .field textarea:focus, .field select:focus {
-  outline: none; border-color: var(--teal); background: white;
+  outline: none; border-color: var(--teal); background: var(--white);
   box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
 }
 .field textarea { resize: vertical; }
 .char-count { text-align: right; font-size: 12px; color: var(--g400); margin-top: 4px; }
+
+/* textarea with mic button overlay */
+.textarea-wrapper { position: relative; }
+.textarea-mic {
+  position: absolute; right: 10px; top: 10px;
+  width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--g200);
+  background: var(--white); cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.textarea-mic:hover { background: var(--teal-l); border-color: var(--teal); }
+.textarea-mic.listening { background: #FEE2E2; border-color: #FECACA; animation: pulse-mic 1s infinite; }
+.field textarea.has-mic { padding-right: 52px; }
 
 .situation-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
 }
 .situation-btn {
   padding: 10px 12px; border: 1.5px solid var(--g200); border-radius: 10px;
-  background: white; cursor: pointer; font-size: 13px; font-weight: 500;
-  font-family: inherit; text-align: center; transition: all 0.15s;
+  background: var(--white); cursor: pointer; font-size: 13px; font-weight: 500;
+  font-family: inherit; text-align: left; transition: all 0.15s;
   display: flex; align-items: center; gap: 8px;
 }
 .situation-btn.selected { border-color: var(--teal); background: var(--teal-l); color: var(--teal-d); }
+.situation-btn:focus { outline: 2px solid var(--teal); outline-offset: 2px; }
 
 .submit-btn {
   width: 100%; padding: 14px; background: var(--teal); color: white;
@@ -228,15 +304,16 @@ header {
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .submit-btn:hover { background: var(--teal-d); }
+.submit-btn:focus { outline: 3px solid var(--teal); outline-offset: 2px; }
 
-/* ── MY REQUESTS ── */
+/* ── REQUESTS ── */
 .my-requests { margin-top: 32px; }
 .request-card {
-  background: white; border: 1px solid var(--g200); border-radius: 12px;
+  background: var(--white); border: 1px solid var(--g200); border-radius: 12px;
   padding: 16px; margin-bottom: 10px;
 }
 .request-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.request-title { font-size: 15px; font-weight: 600; }
+.request-title  { font-size: 15px; font-weight: 600; }
 .status-chip {
   font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
 }
@@ -244,50 +321,63 @@ header {
 .status-chip.s2 { background: #FEF3C7; color: #B45309; }
 .status-chip.s3 { background: #F3E8FF; color: #7E22CE; }
 .status-chip.s4 { background: #DCFCE7; color: #15803D; }
-
 .request-desc { font-size: 13px; color: var(--g600); margin-top: 6px; line-height: 1.5; }
-
-.progress-bar {
-  margin-top: 12px; height: 6px; background: var(--g100); border-radius: 3px; overflow: hidden;
-}
-.progress-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.5s; }
-
+.progress-bar { margin-top: 12px; height: 6px; background: var(--g100); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--teal); border-radius: 3px; }
 .timeline { margin-top: 12px; padding-left: 16px; border-left: 2px solid var(--g200); }
 .timeline-item { padding: 4px 0 8px 16px; font-size: 12px; color: var(--g600); position: relative; }
 .timeline-item::before {
   content: ''; position: absolute; left: -9px; top: 8px;
-  width: 8px; height: 8px; border-radius: 50%; background: var(--g200); border: 2px solid white;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--g200); border: 2px solid var(--white);
 }
 .timeline-item.done::before { background: var(--teal); }
 .timeline-item strong { color: var(--g800); font-weight: 600; }
 
-/* ── SUCCESS MODAL ── */
+/* ── MODAL ── */
 .overlay {
   position: fixed; inset: 0; background: rgba(15,23,42,0.5);
-  display: none; align-items: center; justify-content: center;
-  z-index: 200; padding: 20px;
+  display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px;
 }
 .overlay.open { display: flex; }
 .modal {
-  background: white; border-radius: 20px; padding: 32px 28px;
-  max-width: 420px; width: 100%; text-align: center;
-  animation: popIn 0.25s ease;
+  background: var(--white); border-radius: 20px; padding: 32px 28px;
+  max-width: 420px; width: 100%; text-align: center; animation: popIn 0.25s ease;
 }
-@keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
-}
-.modal-icon { font-size: 56px; margin-bottom: 16px; }
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-icon  { font-size: 56px; margin-bottom: 16px; }
 .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
-.modal-text { font-size: 14px; color: var(--g600); line-height: 1.7; margin-bottom: 24px; }
+.modal-text  { font-size: 14px; color: var(--g600); line-height: 1.7; margin-bottom: 24px; }
 .modal-close {
   width: 100%; padding: 12px; background: var(--teal); color: white;
   border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
   cursor: pointer; font-family: inherit;
 }
+
+/* ── READ ALOUD BUTTON ── */
+.read-aloud-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--g200);
+  background: var(--white); color: var(--g600); font-size: 13px;
+  cursor: pointer; font-family: inherit; margin-bottom: 12px;
+  transition: all 0.15s;
+}
+.read-aloud-btn:hover { background: var(--g100); }
+.read-aloud-btn.reading { color: var(--teal); border-color: var(--teal); }
 </style>
 </head>
 <body>
+
+<!-- ── ACCESSIBILITY TOOLBAR ── -->
+<div id="a11y-bar" role="toolbar" aria-label="アクセシビリティ設定">
+  <span>⚙️ 表示・入力の設定：</span>
+  <button class="a11y-btn" onclick="setFontSize(1)"    id="fs-s" title="文字を小さく">文字 小</button>
+  <button class="a11y-btn on" onclick="setFontSize(1.15)" id="fs-m" title="文字を標準">文字 中</button>
+  <button class="a11y-btn" onclick="setFontSize(1.35)"  id="fs-l" title="文字を大きく">文字 大</button>
+  <span class="a11y-sep">｜</span>
+  <button class="a11y-btn" onclick="toggleContrast()" id="contrast-btn" title="高コントラスト">🌓 高コントラスト</button>
+  <span class="a11y-sep">｜</span>
+  <button class="a11y-btn" onclick="readPageAloud()" id="read-btn" title="このページを読み上げる">🔊 ページを読み上げ</button>
+</div>
 
 <header>
   <div class="logo">
@@ -298,20 +388,17 @@ header {
     </div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showScreen('catalog', this)">🗂️ 道具を探す</button>
-    <button class="nav-tab" onclick="showScreen('request', this)">✏️ 道具を依頼する</button>
+    <button class="nav-tab active" onclick="showScreen('catalog', this)" aria-label="道具を探すタブ">🗂️ 道具を探す</button>
+    <button class="nav-tab" onclick="showScreen('request', this)" aria-label="道具を依頼するタブ">✏️ 道具を依頼する</button>
   </div>
 </header>
 
-<!-- ═══ CATALOG SCREEN ═══════════════════════════════════════════ -->
-<div id="catalog" class="screen active">
-
+<!-- ═══ CATALOG SCREEN ═══ -->
+<div id="catalog" class="screen active" role="main">
   <div class="hero">
     <div class="hero-title">あなたが必要な道具を、<br>一緒に作ります。</div>
-    <div class="hero-sub">困りごとをテキストで伝えるだけ。<br>高専生チームがあなたのための自助グッズを設計・製作します。</div>
-    <button class="hero-cta" onclick="showScreen('request', document.querySelector('[onclick*=request]'))">
-      道具を依頼する →
-    </button>
+    <div class="hero-sub">困りごとを言葉で伝えるだけ（テキスト・音声どちらでも可）。<br>高専生チームがあなたのための自助グッズを設計・製作します。</div>
+    <button class="hero-cta" onclick="showScreen('request', document.querySelectorAll('.nav-tab')[1])">道具を依頼する →</button>
     <div class="stats-row">
       <div class="stat"><div class="stat-num">23</div><div class="stat-label">制作実績</div></div>
       <div class="stat"><div class="stat-num">11</div><div class="stat-label">対応中</div></div>
@@ -320,105 +407,118 @@ header {
   </div>
 
   <div class="content">
-
-    <!-- How it works -->
     <div class="flow-section">
       <div class="section-title">使い方</div>
       <div class="steps">
-        <div class="step">
-          <div class="step-icon">✏️</div>
-          <div class="step-title">困りごとを書く</div>
-          <div class="step-desc">職場や学校での困りごとをテキストで自由に記述するだけ</div>
-        </div>
-        <div class="step">
-          <div class="step-icon">🤝</div>
-          <div class="step-title">高専生が受け取る</div>
-          <div class="step-desc">神山まるごと高専の学生チームがニーズを確認し設計開始</div>
-        </div>
-        <div class="step">
-          <div class="step-icon">🛠️</div>
-          <div class="step-title">試作品が届く</div>
-          <div class="step-desc">3Dプリント・電子工作などで製作した試作品を送付</div>
-        </div>
-        <div class="step">
-          <div class="step-icon">🔄</div>
-          <div class="step-title">一緒に改善する</div>
-          <div class="step-desc">使ってみてフィードバック。納得いくまで繰り返す</div>
-        </div>
+        <div class="step"><div class="step-icon">🎙️</div><div class="step-title">困りごとを伝える</div><div class="step-desc">テキスト入力・音声入力どちらでもOK。日常の言葉で自由に</div></div>
+        <div class="step"><div class="step-icon">🤝</div><div class="step-title">高専生が受け取る</div><div class="step-desc">神山まるごと高専の学生チームがニーズを確認し設計開始</div></div>
+        <div class="step"><div class="step-icon">🛠️</div><div class="step-title">試作品が届く</div><div class="step-desc">3Dプリント・電子工作などで製作した試作品を送付</div></div>
+        <div class="step"><div class="step-icon">🔄</div><div class="step-title">一緒に改善する</div><div class="step-desc">使ってフィードバック。納得いくまで繰り返す</div></div>
       </div>
     </div>
 
-    <!-- Catalog -->
     <div class="section-title">制作実績・サンプル</div>
-
-    <div class="filter-bar" id="filterBar">
+    <div class="filter-bar">
       <button class="filter-chip active" onclick="filterCatalog('all', this)">すべて</button>
       <button class="filter-chip" onclick="filterCatalog('手・指', this)">手・指の操作</button>
       <button class="filter-chip" onclick="filterCatalog('コミュニケーション', this)">コミュニケーション</button>
       <button class="filter-chip" onclick="filterCatalog('感覚', this)">感覚・認知</button>
       <button class="filter-chip" onclick="filterCatalog('就労', this)">就労支援</button>
     </div>
-
     <div class="catalog-grid" id="catalogGrid"></div>
-
   </div>
 </div>
 
-<!-- ═══ REQUEST SCREEN ════════════════════════════════════════════ -->
-<div id="request" class="screen">
+<!-- ═══ REQUEST SCREEN ═══ -->
+<div id="request" class="screen" role="main">
 <div class="request-screen">
 
-  <div class="info-banner">
-    💡 <strong>使い方：</strong>「〇〇が難しい」「〇〇のときに困っている」など、日常の言葉で書いてください。専門的な名称や診断名は不要です。
+  <div class="info-banner" id="infoBanner">
+    💡 <strong>困りごとをそのまま伝えてください。</strong>専門的な名称や診断名は不要です。テキストで入力するか、マイクで話しかけることもできます。
+    <br><button class="read-aloud-btn" onclick="speakText(document.getElementById('infoBanner').textContent)" style="margin-top:8px;">🔊 この説明を読み上げる</button>
   </div>
 
+  <!-- 入力方法の選択 -->
+  <div class="section-title" style="margin-bottom:12px;">入力方法を選んでください</div>
+  <div class="input-method-bar">
+    <button class="method-btn active" id="method-text" onclick="switchMethod('text')" aria-pressed="true">
+      ⌨️ テキスト入力
+    </button>
+    <button class="method-btn" id="method-voice" onclick="switchMethod('voice')" aria-pressed="false">
+      🎙️ 音声入力
+    </button>
+  </div>
+
+  <!-- 音声入力パネル -->
+  <div class="voice-panel" id="voicePanel" aria-live="polite">
+    <div class="mic-btn" id="micBtn" onclick="toggleListening()" role="button"
+         aria-label="マイクをクリックして話しかける" tabindex="0">🎙️</div>
+    <div class="mic-status" id="micStatus">マイクをクリックして話しかけてください</div>
+    <div class="voice-transcript empty" id="voiceTranscript" aria-label="音声認識結果">ここに話した内容が表示されます</div>
+    <div class="voice-actions">
+      <button class="voice-use-btn" onclick="useTranscript()" aria-label="この内容をフォームに使う">この内容を使う</button>
+      <button class="voice-clear-btn" onclick="clearTranscript()" aria-label="クリア">クリア</button>
+    </div>
+    <div class="no-speech-note">
+      ※ 音声入力はChrome・Edgeで動作します。<br>
+      Safariの場合はテキスト入力をご利用ください。
+    </div>
+  </div>
+
+  <!-- テキスト入力フォーム -->
+  <div class="text-panel show" id="textPanel">
   <div class="form-card">
     <div class="form-card-title">📝 困りごとを教えてください</div>
 
     <div class="field">
-      <label>どんな場面で困っていますか？<span class="required">必須</span></label>
-      <div class="situation-grid" id="situationGrid">
-        <button class="situation-btn" onclick="toggleSituation(this)">💼 職場・インターン</button>
-        <button class="situation-btn" onclick="toggleSituation(this)">🎓 授業・講義</button>
-        <button class="situation-btn" onclick="toggleSituation(this)">📝 就職活動</button>
-        <button class="situation-btn" onclick="toggleSituation(this)">🍴 食事・休憩</button>
-        <button class="situation-btn" onclick="toggleSituation(this)">💬 人とのやりとり</button>
-        <button class="situation-btn" onclick="toggleSituation(this)">🏠 その他・日常生活</button>
+      <label id="situationLabel">どんな場面で困っていますか？<span class="required">必須</span></label>
+      <div class="situation-grid" role="group" aria-labelledby="situationLabel">
+        <button class="situation-btn" onclick="toggleSituation(this)" aria-pressed="false">💼 職場・インターン</button>
+        <button class="situation-btn" onclick="toggleSituation(this)" aria-pressed="false">🎓 授業・講義</button>
+        <button class="situation-btn" onclick="toggleSituation(this)" aria-pressed="false">📝 就職活動</button>
+        <button class="situation-btn" onclick="toggleSituation(this)" aria-pressed="false">🍴 食事・休憩</button>
+        <button class="situation-btn" onclick="toggleSituation(this)" aria-pressed="false">💬 人とのやりとり</button>
+        <button class="situation-btn" onclick="toggleSituation(this)" aria-pressed="false">🏠 その他・日常生活</button>
       </div>
     </div>
 
     <div class="field">
-      <label>困っていることを詳しく教えてください<span class="required">必須</span><span class="hint">（専門用語不要、日常の言葉で）</span></label>
-      <textarea id="needsText" rows="5"
-        placeholder="例：書類にハンコを押すとき、手に力が入らず紙がずれてしまいます。両手が使えればいいのですが、左手の可動域が限られていて…"
-        oninput="updateCount(this, 'needsCount', 300)"></textarea>
+      <label for="needsText">困っていることを詳しく教えてください<span class="required">必須</span><span class="hint">（専門用語不要）</span></label>
+      <div class="textarea-wrapper">
+        <textarea id="needsText" rows="5" class="has-mic" aria-required="true"
+          placeholder="例：書類にハンコを押すとき、手に力が入らず紙がずれてしまいます…"
+          oninput="updateCount(this, 'needsCount', 300)"></textarea>
+        <button class="textarea-mic" id="textareaMic" onclick="toggleInlineMic()"
+                title="音声で入力する" aria-label="音声で入力する">🎙️</button>
+      </div>
       <div class="char-count"><span id="needsCount">0</span> / 300文字</div>
     </div>
 
     <div class="field">
-      <label>今どんな方法で工夫していますか？<span class="hint">（あれば）</span></label>
-      <textarea id="workaround" rows="3"
+      <label for="workaround">今どんな方法で工夫していますか？<span class="hint">（あれば）</span></label>
+      <textarea id="workaround" rows="2"
         placeholder="例：テープで固定していますが、毎回剥がれてしまいます"></textarea>
     </div>
 
     <div class="field">
-      <label>どんな感触・素材が好みですか？<span class="hint">（感覚過敏がある場合など）</span></label>
+      <label for="sensory">好みの感触・素材はありますか？<span class="hint">（感覚過敏がある方など）</span></label>
       <input type="text" id="sensory"
-        placeholder="例：プラスチックより布地が好き、重さがある方が安心する、など">
+        placeholder="例：プラスチックより布地が好き、重さがあると安心する">
     </div>
 
     <div class="field">
-      <label>ニックネーム（任意）</label>
-      <input type="text" id="nickname" placeholder="例：さくらさん">
+      <label for="nickname">ニックネーム<span class="hint">（任意）</span></label>
+      <input type="text" id="nickname" placeholder="例：さくらさん" autocomplete="off">
     </div>
 
-    <button class="submit-btn" onclick="submitRequest()">
+    <button class="submit-btn" onclick="submitRequest()" aria-label="依頼を送る">
       📨 依頼を送る（無料）
     </button>
   </div>
+  </div><!-- /textPanel -->
 
-  <!-- My requests -->
-  <div class="my-requests">
+  <!-- 進捗 -->
+  <div class="my-requests" aria-live="polite">
     <div class="section-title">依頼の進捗</div>
     <div id="requestList"></div>
   </div>
@@ -427,170 +527,279 @@ header {
 </div>
 
 <!-- SUCCESS MODAL -->
-<div class="overlay" id="successOverlay">
+<div class="overlay" id="successOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
     <div class="modal-icon">🎉</div>
-    <div class="modal-title">依頼を受け付けました！</div>
+    <div class="modal-title" id="modalTitle">依頼を受け付けました！</div>
     <div class="modal-text">
       高専生チームが内容を確認し、<strong>3〜5日以内</strong>にご連絡します。<br><br>
-      設計が始まったらメールでお知らせします。<br>
-      一緒に、あなたに合った道具を作りましょう。
+      設計が始まったらメールでお知らせします。<br>一緒に、あなたに合った道具を作りましょう。
     </div>
     <button class="modal-close" onclick="closeModal()">閉じる</button>
   </div>
 </div>
 
 <script>
-// ─── CATALOG DATA ─────────────────────────────────────────────────
+// ─── A11Y ────────────────────────────────────────────────────────
+let fontScale = 1.15;
+function setFontSize(scale) {
+  fontScale = scale;
+  document.documentElement.style.setProperty('--font-scale', scale);
+  ['fs-s','fs-m','fs-l'].forEach(id => document.getElementById(id).classList.remove('on'));
+  document.getElementById(scale === 1 ? 'fs-s' : scale === 1.15 ? 'fs-m' : 'fs-l').classList.add('on');
+}
+setFontSize(1.15);
+
+function toggleContrast() {
+  document.body.classList.toggle('high-contrast');
+  document.getElementById('contrast-btn').classList.toggle('on');
+}
+
+// ─── TTS ─────────────────────────────────────────────────────────
+const synth = window.speechSynthesis;
+function speakText(text) {
+  if (!synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text.trim().replace(/\s+/g, ' '));
+  u.lang = 'ja-JP'; u.rate = 0.9;
+  const jaVoice = synth.getVoices().find(v => v.lang.startsWith('ja'));
+  if (jaVoice) u.voice = jaVoice;
+  document.getElementById('read-btn').classList.add('on');
+  u.onend = () => document.getElementById('read-btn').classList.remove('on');
+  synth.speak(u);
+}
+function readPageAloud() {
+  const screen = document.querySelector('.screen.active');
+  speakText(screen.innerText.slice(0, 600));
+}
+synth?.getVoices();
+synth?.addEventListener('voiceschanged', () => {});
+
+// ─── SPEECH RECOGNITION ──────────────────────────────────────────
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+let recognitionTarget = null; // 'panel' or 'inline'
+
+function initRecognition(target) {
+  if (!SpeechRecognition) return null;
+  const r = new SpeechRecognition();
+  r.lang = 'ja-JP'; r.interimResults = true; r.continuous = false;
+
+  r.onstart = () => {
+    isListening = true;
+    if (target === 'panel') {
+      document.getElementById('micBtn').classList.add('listening');
+      document.getElementById('micBtn').textContent = '⏹';
+      document.getElementById('micStatus').textContent = '聞いています… 話しかけてください';
+    } else {
+      document.getElementById('textareaMic').classList.add('listening');
+    }
+  };
+
+  r.onresult = (e) => {
+    const transcript = [...e.results].map(r => r[0].transcript).join('');
+    if (target === 'panel') {
+      const el = document.getElementById('voiceTranscript');
+      el.textContent = transcript;
+      el.classList.remove('empty');
+    } else {
+      const ta = document.getElementById('needsText');
+      ta.value = transcript;
+      updateCount(ta, 'needsCount', 300);
+    }
+  };
+
+  r.onend = () => {
+    isListening = false;
+    if (target === 'panel') {
+      document.getElementById('micBtn').classList.remove('listening');
+      document.getElementById('micBtn').textContent = '🎙️';
+      document.getElementById('micStatus').textContent = 'クリックしてもう一度話しかける';
+    } else {
+      document.getElementById('textareaMic').classList.remove('listening');
+    }
+  };
+
+  r.onerror = (e) => {
+    isListening = false;
+    document.getElementById('micBtn').classList.remove('listening');
+    document.getElementById('micBtn').textContent = '🎙️';
+    if (target === 'panel') {
+      document.getElementById('micStatus').textContent = 'エラー：' + (e.error === 'not-allowed' ? 'マイクの許可が必要です' : e.error);
+    }
+    document.getElementById('textareaMic').classList.remove('listening');
+  };
+
+  return r;
+}
+
+function toggleListening() {
+  if (!SpeechRecognition) {
+    alert('このブラウザは音声入力に対応していません。\nChrome または Edge をお使いください。');
+    return;
+  }
+  if (isListening) { recognition?.stop(); return; }
+  recognitionTarget = 'panel';
+  recognition = initRecognition('panel');
+  recognition?.start();
+}
+
+function toggleInlineMic() {
+  if (!SpeechRecognition) {
+    alert('このブラウザは音声入力に対応していません。\nChrome または Edge をお使いください。');
+    return;
+  }
+  if (isListening) { recognition?.stop(); return; }
+  recognitionTarget = 'inline';
+  recognition = initRecognition('inline');
+  recognition?.start();
+}
+
+function useTranscript() {
+  const text = document.getElementById('voiceTranscript').textContent;
+  if (!text || text === 'ここに話した内容が表示されます') return;
+  document.getElementById('needsText').value = text;
+  updateCount(document.getElementById('needsText'), 'needsCount', 300);
+  switchMethod('text');
+}
+
+function clearTranscript() {
+  const el = document.getElementById('voiceTranscript');
+  el.textContent = 'ここに話した内容が表示されます';
+  el.classList.add('empty');
+  document.getElementById('micStatus').textContent = 'マイクをクリックして話しかけてください';
+}
+
+// ─── METHOD SWITCH ───────────────────────────────────────────────
+function switchMethod(method) {
+  const isVoice = method === 'voice';
+  document.getElementById('voicePanel').classList.toggle('show', isVoice);
+  document.getElementById('textPanel').classList.toggle('show', !isVoice);
+  document.getElementById('method-voice').classList.toggle('active', isVoice);
+  document.getElementById('method-voice').setAttribute('aria-pressed', isVoice);
+  document.getElementById('method-text').classList.toggle('active', !isVoice);
+  document.getElementById('method-text').setAttribute('aria-pressed', !isVoice);
+}
+
+// ─── CATALOG ─────────────────────────────────────────────────────
 const TOOLS = [
-  {
-    id: 1, name: '片手ハンコ台', icon: '🔏', color: '#DBEAFE',
-    desc: '片手でも書類にハンコを押せるように、紙を固定するクリップ付きの台。角度も調整可能。',
-    tags: ['手・指', '就労'], status: '設計データ公開中', badge: '人気',
-  },
-  {
-    id: 2, name: 'ひとくちカフ', icon: '🥄', color: '#DCFCE7',
-    desc: 'スプーンやフォークを手のひら全体で持てるようにするシリコン製のグリップ補助具。',
-    tags: ['手・指'], status: '設計データ公開中', badge: '',
-  },
-  {
-    id: 3, name: '小声メモパッド', icon: '📋', color: '#F3E8FF',
-    desc: '声が出にくいときのために、よく使うフレーズをカード型でまとめたセット。職場用と日常用の2種。',
-    tags: ['コミュニケーション', '就労'], status: '設計データ公開中', badge: 'new',
-  },
-  {
-    id: 4, name: 'キーボードガード', icon: '⌨️', color: '#FEF3C7',
-    desc: '意図しないキーを押してしまう場合に、入力したいキー以外をガードするアクリル製カバー。',
-    tags: ['手・指', '就労'], status: '試作改善中', badge: '',
-  },
-  {
-    id: 5, name: '光のひとこと', icon: '💡', color: '#FFEDD5',
-    desc: '言葉の代わりに光の色で気持ちを伝えるデバイス。「集中中」「少し待って」「OK」を色で表示。',
-    tags: ['コミュニケーション', '感覚'], status: '設計データ公開中', badge: 'new',
-  },
-  {
-    id: 6, name: 'ぐっすりイヤーマフ記録帳', icon: '🎧', color: '#E0F2FE',
-    desc: '市販イヤーマフと組み合わせて使う「今日の感覚ログ」カード。どの音が辛かったかを記録できる。',
-    tags: ['感覚', '就労'], status: '設計データ公開中', badge: '',
-  },
+  { id:1, name:'片手ハンコ台', icon:'🔏', color:'#DBEAFE',
+    desc:'片手でも書類にハンコを押せるよう、紙を固定するクリップ付きの台。角度も調整可能。',
+    tags:['手・指','就労'], status:'設計データ公開中', badge:'人気' },
+  { id:2, name:'ひとくちカフ', icon:'🥄', color:'#DCFCE7',
+    desc:'スプーンやフォークを手のひら全体で持てるようにするシリコン製のグリップ補助具。',
+    tags:['手・指'], status:'設計データ公開中', badge:'' },
+  { id:3, name:'小声メモパッド', icon:'📋', color:'#F3E8FF',
+    desc:'声が出にくいときのために、よく使うフレーズをカード型でまとめたセット。',
+    tags:['コミュニケーション','就労'], status:'設計データ公開中', badge:'new' },
+  { id:4, name:'キーボードガード', icon:'⌨️', color:'#FEF3C7',
+    desc:'意図しないキーを押してしまう場合に、入力したいキー以外をガードするアクリル製カバー。',
+    tags:['手・指','就労'], status:'試作改善中', badge:'' },
+  { id:5, name:'光のひとこと', icon:'💡', color:'#FFEDD5',
+    desc:'言葉の代わりに光の色で気持ちを伝えるデバイス。「集中中」「少し待って」「OK」を色で表示。',
+    tags:['コミュニケーション','感覚'], status:'設計データ公開中', badge:'new' },
+  { id:6, name:'感覚ログカード', icon:'🎧', color:'#E0F2FE',
+    desc:'「今日の感覚」を記録できるポケットサイズのカード。就職活動の自己開示練習にも。',
+    tags:['感覚','就労'], status:'設計データ公開中', badge:'' },
 ];
 
 let activeFilter = 'all';
-
 function filterCatalog(tag, el) {
   activeFilter = tag;
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   renderCatalog();
 }
-
 function renderCatalog() {
-  const grid = document.getElementById('catalogGrid');
   const filtered = activeFilter === 'all' ? TOOLS : TOOLS.filter(t => t.tags.includes(activeFilter));
-  grid.innerHTML = filtered.map(t => `
-    <div class="tool-card">
+  document.getElementById('catalogGrid').innerHTML = filtered.map(t => `
+    <div class="tool-card" tabindex="0" role="article" aria-label="${t.name}">
       <div class="tool-thumb" style="background:${t.color};">
         <span>${t.icon}</span>
-        ${t.badge ? `<div class="tool-badge ${t.badge === 'new' ? 'new' : ''}">${t.badge}</div>` : ''}
+        ${t.badge ? `<div class="tool-badge ${t.badge==='new'?'new':''}">${t.badge}</div>` : ''}
       </div>
       <div class="tool-body">
         <div class="tool-name">${t.name}</div>
         <div class="tool-desc">${t.desc}</div>
-        <div class="tool-tags">${t.tags.map(g => `<span class="tag">${g}</span>`).join('')}</div>
+        <div class="tool-tags">${t.tags.map(g=>`<span class="tag">${g}</span>`).join('')}</div>
       </div>
       <div class="tool-footer">
         <span class="tool-status">📁 ${t.status}</span>
         <button class="detail-btn">詳細 →</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ─── SITUATION SELECT ────────────────────────────────────────────
+// ─── FORM ────────────────────────────────────────────────────────
 function toggleSituation(el) {
+  const pressed = el.getAttribute('aria-pressed') === 'true';
+  el.setAttribute('aria-pressed', !pressed);
   el.classList.toggle('selected');
 }
-
-// ─── CHAR COUNT ──────────────────────────────────────────────────
-function updateCount(el, countId, max) {
+function updateCount(el, id, max) {
   const len = el.value.length;
-  document.getElementById(countId).textContent = len;
+  document.getElementById(id).textContent = len;
   if (len > max) el.value = el.value.slice(0, max);
 }
 
 // ─── SUBMIT ──────────────────────────────────────────────────────
 const SAMPLE_REQUESTS = [
-  {
-    title: '書類整理用の片手クリップ台',
-    desc: '職場で書類をまとめるとき、片手だと紙がバラバラになってしまいます。',
-    status: '設計中', cls: 's2', progress: 50,
-    timeline: [
-      { done: true, text: '依頼を受け付けました' },
-      { done: true, text: '担当チームが決まりました（神山Bチーム）' },
-      { done: false, text: '設計案をお送りします（今週中）' },
-      { done: false, text: '試作品の製作' },
-    ]
-  },
+  { title:'書類整理用の片手クリップ台', desc:'職場で書類をまとめるとき、片手だと紙がバラバラになってしまいます。',
+    status:'設計中', cls:'s2', progress:50,
+    timeline:[
+      {done:true,  text:'依頼を受け付けました'},
+      {done:true,  text:'担当チームが決まりました（神山Bチーム）'},
+      {done:false, text:'設計案をお送りします（今週中）'},
+      {done:false, text:'試作品の製作'},
+    ]},
 ];
 
 function renderRequests() {
-  const list = document.getElementById('requestList');
-  const stored = JSON.parse(localStorage.getItem('jido_requests') || '[]');
+  const stored = JSON.parse(localStorage.getItem('jido_req') || '[]');
   const all = [...stored, ...SAMPLE_REQUESTS];
-  if (!all.length) {
-    list.innerHTML = '<div style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">まだ依頼はありません</div>';
-    return;
-  }
-  list.innerHTML = all.map(r => `
-    <div class="request-card">
-      <div class="request-header">
-        <div class="request-title">${r.title}</div>
-        <span class="status-chip ${r.cls}">${r.status}</span>
-      </div>
-      <div class="request-desc">${r.desc}</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${r.progress}%"></div></div>
-      <div class="timeline">
-        ${r.timeline.map(item => `
-          <div class="timeline-item ${item.done ? 'done' : ''}">
-            ${item.done ? '<strong>' + item.text + '</strong>' : item.text}
+  document.getElementById('requestList').innerHTML = all.length
+    ? all.map(r => `
+        <div class="request-card" role="article">
+          <div class="request-header">
+            <div class="request-title">${r.title}</div>
+            <span class="status-chip ${r.cls}">${r.status}</span>
           </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
+          <div class="request-desc">${r.desc}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${r.progress}%"></div></div>
+          <div class="timeline">
+            ${r.timeline.map(i=>`<div class="timeline-item ${i.done?'done':''}">${i.done?`<strong>${i.text}</strong>`:i.text}</div>`).join('')}
+          </div>
+        </div>`).join('')
+    : '<div style="text-align:center;padding:32px;color:#94A3B8;font-size:14px;">まだ依頼はありません</div>';
 }
 
 function submitRequest() {
   const needs = document.getElementById('needsText').value.trim();
-  const situations = [...document.querySelectorAll('.situation-btn.selected')].map(b => b.textContent.trim());
-  if (!needs || !situations.length) {
-    alert('場面と困りごとを入力してください');
-    return;
-  }
+  const sels  = [...document.querySelectorAll('.situation-btn.selected')];
+  if (!needs || !sels.length) { alert('場面と困りごとを入力してください'); return; }
   const req = {
-    title: needs.slice(0, 30) + (needs.length > 30 ? '…' : ''),
-    desc: needs,
-    status: '受付中', cls: 's1', progress: 10,
-    timeline: [
-      { done: true, text: '依頼を受け付けました' },
-      { done: false, text: '担当チームのアサイン（3〜5日）' },
-      { done: false, text: '設計案の作成' },
-      { done: false, text: '試作品の製作・送付' },
+    title: needs.slice(0,30) + (needs.length>30?'…':''),
+    desc: needs, status:'受付中', cls:'s1', progress:10,
+    timeline:[
+      {done:true,  text:'依頼を受け付けました'},
+      {done:false, text:'担当チームのアサイン（3〜5日）'},
+      {done:false, text:'設計案の作成'},
+      {done:false, text:'試作品の製作・送付'},
     ]
   };
-  const stored = JSON.parse(localStorage.getItem('jido_requests') || '[]');
+  const stored = JSON.parse(localStorage.getItem('jido_req') || '[]');
   stored.unshift(req);
-  localStorage.setItem('jido_requests', JSON.stringify(stored));
+  localStorage.setItem('jido_req', JSON.stringify(stored));
   document.getElementById('successOverlay').classList.add('open');
   document.getElementById('needsText').value = '';
-  document.querySelectorAll('.situation-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.situation-btn').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed','false'); });
   document.getElementById('needsCount').textContent = '0';
+  speakText('依頼を受け付けました。3日から5日以内にご連絡します。');
   renderRequests();
 }
 
-function closeModal() {
-  document.getElementById('successOverlay').classList.remove('open');
-}
+function closeModal() { document.getElementById('successOverlay').classList.remove('open'); }
 
 // ─── SCREEN SWITCH ───────────────────────────────────────────────
 function showScreen(name, el) {
