@@ -48,7 +48,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  font-size: calc(16px * var(--font-scale));
+  zoom: var(--font-scale);
 }
 
 /* ── ACCESSIBILITY TOOLBAR ── */
@@ -363,9 +363,37 @@ header {
 }
 .read-aloud-btn:hover { background: var(--g100); }
 .read-aloud-btn.reading { color: var(--teal); border-color: var(--teal); }
+
+/* ── FOCUS / TARGETS / MOTION ── */
+button:focus-visible, input:focus-visible, textarea:focus-visible,
+select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--teal); outline-offset: 2px;
+}
+body.high-contrast :focus-visible { outline-color: #FFD700; }
+.situation-btn, .method-btn, .nav-tab, .a11y-btn { min-height: 44px; }
+
+.form-error {
+  display: none; background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C;
+  border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 14px; line-height: 1.6;
+}
+.form-error.show { display: block; }
+body.high-contrast .form-error { background: #3d0000; border-color: #ff8888; color: #ffaaaa; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 999;
+  background: var(--teal); color: white; padding: 10px 18px;
+  border-radius: 0 0 10px 0; font-size: 14px; font-weight: 700; text-decoration: none;
+}
+.skip-link:focus { left: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
+
+<a class="skip-link" href="#catalog">本文へスキップ</a>
 
 <!-- ── ACCESSIBILITY TOOLBAR ── -->
 <div id="a11y-bar" role="toolbar" aria-label="アクセシビリティ設定">
@@ -511,6 +539,8 @@ header {
       <input type="text" id="nickname" placeholder="例：さくらさん" autocomplete="off">
     </div>
 
+    <div class="form-error" id="formError" role="alert"></div>
+
     <button class="submit-btn" onclick="submitRequest()" aria-label="依頼を送る">
       📨 依頼を送る（無料）
     </button>
@@ -524,6 +554,20 @@ header {
   </div>
 
 </div>
+</div>
+
+<!-- TOOL DETAIL MODAL -->
+<div class="overlay" id="toolOverlay" role="dialog" aria-modal="true" aria-labelledby="toolModalTitle">
+  <div class="modal">
+    <div class="modal-icon" id="toolModalIcon"></div>
+    <div class="modal-title" id="toolModalTitle"></div>
+    <div class="modal-text" id="toolModalDesc" style="text-align:left;"></div>
+    <button class="read-aloud-btn"
+      onclick="speakText(document.getElementById('toolModalTitle').textContent + '。' + document.getElementById('toolModalDesc').textContent)">
+      🔊 読み上げる
+    </button>
+    <button class="modal-close" id="toolModalClose" onclick="closeToolModal()">閉じる</button>
+  </div>
 </div>
 
 <!-- SUCCESS MODAL -->
@@ -541,18 +585,26 @@ header {
 
 <script>
 // ─── A11Y ────────────────────────────────────────────────────────
-let fontScale = 1.15;
+let a11y = JSON.parse(localStorage.getItem('jido_a11y') || '{"scale":1.15,"contrast":false}');
+function saveA11y() { localStorage.setItem('jido_a11y', JSON.stringify(a11y)); }
+
 function setFontSize(scale) {
-  fontScale = scale;
+  a11y.scale = scale; saveA11y();
   document.documentElement.style.setProperty('--font-scale', scale);
   ['fs-s','fs-m','fs-l'].forEach(id => document.getElementById(id).classList.remove('on'));
   document.getElementById(scale === 1 ? 'fs-s' : scale === 1.15 ? 'fs-m' : 'fs-l').classList.add('on');
 }
-setFontSize(1.15);
 
 function toggleContrast() {
-  document.body.classList.toggle('high-contrast');
-  document.getElementById('contrast-btn').classList.toggle('on');
+  a11y.contrast = !a11y.contrast; saveA11y();
+  document.body.classList.toggle('high-contrast', a11y.contrast);
+  document.getElementById('contrast-btn').classList.toggle('on', a11y.contrast);
+}
+
+setFontSize(a11y.scale);
+if (a11y.contrast) {
+  document.body.classList.add('high-contrast');
+  document.getElementById('contrast-btn').classList.add('on');
 }
 
 // ─── TTS ─────────────────────────────────────────────────────────
@@ -569,6 +621,11 @@ function speakText(text) {
   synth.speak(u);
 }
 function readPageAloud() {
+  if (synth?.speaking) {
+    synth.cancel();
+    document.getElementById('read-btn').classList.remove('on');
+    return;
+  }
   const screen = document.querySelector('.screen.active');
   speakText(screen.innerText.slice(0, 600));
 }
@@ -580,6 +637,7 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 let recognition = null;
 let isListening = false;
 let recognitionTarget = null; // 'panel' or 'inline'
+let inlineBaseText = '';      // 音声入力開始時点の入力済みテキスト（上書きせず追記する）
 
 function initRecognition(target) {
   if (!SpeechRecognition) return null;
@@ -605,7 +663,7 @@ function initRecognition(target) {
       el.classList.remove('empty');
     } else {
       const ta = document.getElementById('needsText');
-      ta.value = transcript;
+      ta.value = inlineBaseText + transcript;
       updateCount(ta, 'needsCount', 300);
     }
   };
@@ -652,6 +710,7 @@ function toggleInlineMic() {
   }
   if (isListening) { recognition?.stop(); return; }
   recognitionTarget = 'inline';
+  inlineBaseText = document.getElementById('needsText').value;
   recognition = initRecognition('inline');
   recognition?.start();
 }
@@ -714,7 +773,9 @@ function filterCatalog(tag, el) {
 function renderCatalog() {
   const filtered = activeFilter === 'all' ? TOOLS : TOOLS.filter(t => t.tags.includes(activeFilter));
   document.getElementById('catalogGrid').innerHTML = filtered.map(t => `
-    <div class="tool-card" tabindex="0" role="article" aria-label="${t.name}">
+    <div class="tool-card" tabindex="0" role="button" aria-label="${t.name}の詳細を開く"
+         onclick="openTool(${t.id})"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTool(${t.id});}">
       <div class="tool-thumb" style="background:${t.color};">
         <span>${t.icon}</span>
         ${t.badge ? `<div class="tool-badge ${t.badge==='new'?'new':''}">${t.badge}</div>` : ''}
@@ -726,7 +787,7 @@ function renderCatalog() {
       </div>
       <div class="tool-footer">
         <span class="tool-status">📁 ${t.status}</span>
-        <button class="detail-btn">詳細 →</button>
+        <button class="detail-btn" onclick="event.stopPropagation();openTool(${t.id})">詳細 →</button>
       </div>
     </div>`).join('');
 }
@@ -777,7 +838,18 @@ function renderRequests() {
 function submitRequest() {
   const needs = document.getElementById('needsText').value.trim();
   const sels  = [...document.querySelectorAll('.situation-btn.selected')];
-  if (!needs || !sels.length) { alert('場面と困りごとを入力してください'); return; }
+  const err = document.getElementById('formError');
+  const missing = [];
+  if (!sels.length) missing.push('「どんな場面で困っていますか」を1つ以上選んでください');
+  if (!needs) missing.push('「困っていること」を入力してください（音声入力も使えます）');
+  if (missing.length) {
+    err.innerHTML = '⚠️ ' + missing.join('<br>⚠️ ');
+    err.classList.add('show');
+    err.scrollIntoView({ block: 'center' });
+    speakText(missing.join('。'));
+    return;
+  }
+  err.classList.remove('show');
   const req = {
     title: needs.slice(0,30) + (needs.length>30?'…':''),
     desc: needs, status:'受付中', cls:'s1', progress:10,
@@ -792,6 +864,7 @@ function submitRequest() {
   stored.unshift(req);
   localStorage.setItem('jido_req', JSON.stringify(stored));
   document.getElementById('successOverlay').classList.add('open');
+  document.querySelector('#successOverlay .modal-close').focus();
   document.getElementById('needsText').value = '';
   document.querySelectorAll('.situation-btn').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed','false'); });
   document.getElementById('needsCount').textContent = '0';
@@ -800,6 +873,26 @@ function submitRequest() {
 }
 
 function closeModal() { document.getElementById('successOverlay').classList.remove('open'); }
+
+// ─── TOOL DETAIL MODAL ───────────────────────────────────────────
+function openTool(id) {
+  const t = TOOLS.find(x => x.id === id); if (!t) return;
+  document.getElementById('toolModalIcon').textContent  = t.icon;
+  document.getElementById('toolModalTitle').textContent = t.name;
+  document.getElementById('toolModalDesc').textContent  =
+    t.desc + '（現在：' + t.status + '）このデザインをもとに、あなたに合わせたカスタマイズ依頼もできます。';
+  document.getElementById('toolOverlay').classList.add('open');
+  document.getElementById('toolModalClose').focus();
+}
+function closeToolModal() { document.getElementById('toolOverlay').classList.remove('open'); }
+
+// Esc でモーダルを閉じる／マイクボタンをキーボードでも操作できるように
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeToolModal(); closeModal(); }
+});
+document.getElementById('micBtn').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleListening(); }
+});
 
 // ─── SCREEN SWITCH ───────────────────────────────────────────────
 function showScreen(name, el) {
